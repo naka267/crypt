@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>暗号作成機-β版-</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        #inputText, #password {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        button {
+            display: block;
+            width: 200px;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: blue;
+            color: white;
+            border: none;
+            display:inline-block;
+        }
+
+        
+        button:hover{
+            background-color: #007BFF;
+        }
+        
+        #result {
+            margin: 20px 0;
+            word-wrap: break-word;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+</head>
+<body>
+    <h1>暗号作成機-β版-</h1>
+    <input type="text" id="inputText" placeholder="暗号化/復号化したいテキストを入力">
+    <input type="password" id="password" placeholder="(任意)秘密鍵を入力">
+<center>
+    <button onclick="encryptText()">暗号化</button>
+    <button onclick="decryptText()">復号化</button>
+
+</center>
+    <p id="result"></p>
+        <button id="copyButton" style="display: none;" onclick="copyToClipboard()">コピー</button>
+
+    <script>
+        function getSecretKey() {
+            return document.getElementById('password').value;
+        }
+
+        function encryptText() {
+            const inputText = document.getElementById('inputText').value;
+            const unicodeText = [...inputText].map(char => char.charCodeAt(0)).join(' ');
+            const encryptedText = CryptoJS.AES.encrypt(unicodeText, getSecretKey()).toString();
+            document.getElementById('result').innerText = 'Encrypted Text: ' + encryptedText;
+            document.getElementById('copyButton').style.display = 'block';
+        }
+
+        function decryptText() {
+            const encryptedText = document.getElementById('inputText').value;
+            const bytes = CryptoJS.AES.decrypt(encryptedText, getSecretKey());
+            const originalText = bytes.toString(CryptoJS.enc.Utf8);
+            const decryptedText = String.fromCharCode(...originalText.split(' '));
+            document.getElementById('result').innerText = 'Decrypted Text: ' + decryptedText;
+            document.getElementById('copyButton').style.display = 'block';
+        }
+
+        function copyToClipboard() {
+            const str = document.getElementById('result').innerText.split(': ')[1];
+            const el = document.createElement('textarea');
+            el.value = str;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        }
+    </script>
+</body>
+</html>
